@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balde de tinta</title>
+  <style>
+    .content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: min-content;
+      box-sizing: border-box;
+    }
+
+    .row {
+      display: flex;
+    }
+
+    .row div {
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      border: 1px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #cor {
+      margin-top: 10px;
+      font-size: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <div id="painel"></div>
+    <input id="cor" value="1" type="number" />
+  </div>
+</body>
+<script>
+  // pode testar com matrizes diferentes
+  let matriz = [
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 2, 0, 2, 0],
+    [0, 2, 2, 0, 0],
+    [0, 2, 0, 2, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+  ];
+
+  // Plot matriz
+  let painel = document.querySelector("#painel");
+  let painelContent = '';
+  matriz.forEach((row, i) => {
+    let rowContent = '<div class="row">';
+    row.forEach((item, j) => {
+      rowContent += `<div id="item_${j}_${i}">${item}</div>`;
+    });
+    rowContent += '</div>';
+    painelContent += rowContent;
+  });
+  painel.innerHTML = painelContent;
+
+  // add listeners
+  matriz.forEach((row, i) => {
+    row.forEach((item, j) => {
+      const itemClicado = `#item_${j}_${i}`;
+      const div = document.querySelector(itemClicado);
+      div.addEventListener('click', () => {
+        const cor = +document.querySelector("#cor").value;
+        pintarMatriz(matriz, itemClicado, cor, null);
+      })
+    });
+  });
+
+  const pegarMaximoXeY = (matriz) => {
+    const x = matriz[0].length - 1;
+    const y = matriz.length - 1;
+    return { x, y };
+  }
+
+  const pintarMatriz = (matriz, itemClicado, cor, corDoClique) => {
+    const itemClicladoSplit = itemClicado.split('_')
+    const x = +itemClicladoSplit[1]
+    const y = +itemClicladoSplit[2]
+
+    const corItem = +document.querySelector(itemClicado).innerHTML;
+    const corInicial = corDoClique === null ? corItem : corDoClique;
+
+    if (corItem === corInicial) {
+      document.querySelector(itemClicado).innerHTML = cor;
+    } else {
+      return;
+    }
+    // pixel esquerda
+    if (x > 0) {
+      pintarMatriz(matriz, `#item_${x - 1}_${y}`, cor, corInicial);
+    }
+    // pixel diagonal esquerda cima
+    if (x > 0 && y > 0) {
+      pintarMatriz(matriz, `#item_${x - 1}_${y - 1}`, cor, corInicial);
+    }
+    // pixel direita
+    if (x < pegarMaximoXeY(matriz).x) {
+      pintarMatriz(matriz, `#item_${x + 1}_${y}`, cor, corInicial);
+    }
+    // pixel diagonal direita cima
+    if (x < pegarMaximoXeY(matriz).x && y > 0) {
+      pintarMatriz(matriz, `#item_${x + 1}_${y - 1}`, cor, corInicial);
+    }
+    // pixel cima
+    if (y > 0) {
+      pintarMatriz(matriz, `#item_${x}_${y - 1}`, cor, corInicial);
+    }
+    // pixel diagonal esquerda baixo
+    if (x > 0 && y < pegarMaximoXeY(matriz).y) {
+      pintarMatriz(matriz, `#item_${x - 1}_${y + 1}`, cor, corInicial);
+    }
+    // pixel diagonal direita baixo
+    if (x < pegarMaximoXeY(matriz).x && y < pegarMaximoXeY(matriz).y) {
+      pintarMatriz(matriz, `#item_${x + 1}_${y + 1}`, cor, corInicial);
+    }
+  }
+
+
+</script>
+
+</html>
